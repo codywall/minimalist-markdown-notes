@@ -26,6 +26,8 @@ const Editor = ({ text, handleTextChange }) => {
   const [value, setValue] = useState(text);
   const [selectedHeading, setSelectedHeading] = useState('');
   const [fontSize, setFontSize] = useState(22);
+  const [history, setHistory] = useState([text]);
+  const [historyIndex, setHistoryIndex] = useState(0);
 
   const textareaRef = useRef();
 
@@ -37,6 +39,14 @@ const Editor = ({ text, handleTextChange }) => {
     const newValue = event.target.value;
     setValue(newValue);
     handleTextChange(newValue);
+
+    // Update history and historyIndex
+    setHistory((prevHistory) => {
+      const newHistory = prevHistory.slice(0, historyIndex + 1);
+      newHistory.push(newValue);
+      return newHistory;
+    });
+    setHistoryIndex((prevIndex) => prevIndex + 1);
   };
 
   const getMarkdownText = () => {
@@ -94,6 +104,19 @@ const Editor = ({ text, handleTextChange }) => {
       textarea.selectionStart = textarea.selectionEnd = start + newText.length;
       textarea.focus();
     }, 0);
+  };
+
+  const handleKeyDown = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+      event.preventDefault();
+
+      if (historyIndex > 0) {
+        setHistoryIndex((prevIndex) => prevIndex - 1);
+        const newValue = history[historyIndex - 1];
+        setValue(newValue);
+        handleTextChange(newValue);
+      }
+    }
   };
 
   const handleHeadingClick = (level) => {
@@ -226,6 +249,7 @@ const Editor = ({ text, handleTextChange }) => {
               value={value}
               minRows={35}
               onChange={handleChange}
+              onKeyDown={handleKeyDown}
               size={`${fontSize}px`}
             />
           </Card>
