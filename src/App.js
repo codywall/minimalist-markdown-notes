@@ -1,24 +1,37 @@
-import logo from './logo.svg';
+import { useState, useEffect } from 'react';
+import Editor from './components/Editor';
 import './App.css';
+import { Container, MantineProvider } from '@mantine/core';
 
 function App() {
+  const [text, setText] = useState('');
+
+  useEffect(() => {
+    const storedNotes = JSON.parse(localStorage.getItem('notes')) || [];
+    if (storedNotes.length > 0) {
+      setText(storedNotes[0].content);
+    }
+  }, []);
+
+  const handleTextChange = (value) => {
+    setText(value);
+    saveNoteToLocalStorage(value);
+  };
+
+  const saveNoteToLocalStorage = (value) => {
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+    const newNote = { timestamp: Date.now(), content: value };
+
+    notes = [newNote, ...notes.slice(0, 9)];
+    localStorage.setItem('notes', JSON.stringify(notes));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MantineProvider withGlobalStyles withNormalizeCSS>
+      <Container>
+        <Editor text={text} handleTextChange={handleTextChange} />
+      </Container>
+    </MantineProvider>
   );
 }
 
