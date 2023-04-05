@@ -28,9 +28,9 @@ function App() {
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <Container>
+      <>
         <Editor text={text} handleTextChange={handleTextChange} />
-      </Container>
+      </>
     </MantineProvider>
   );
 }

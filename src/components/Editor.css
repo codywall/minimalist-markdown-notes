@@ -96,3 +96,7 @@
 .editor:focus {
     outline: none;
 }
+
+.mde-textarea textarea {
+    padding: 40px;
+}
